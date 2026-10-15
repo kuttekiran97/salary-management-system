@@ -45,3 +45,14 @@ The brief asks for intentional use of AI tools. This file records how AI was use
   - Hibernate's schema validation rejected SQLite's `INTEGER` type. Fixed by declaring the column types, not by turning validation off.
 - **Product decision:** Sorting by salary across currencies would rank ₹30 lakh above $150k, so salary sorting uses the USD equivalent.
 - **Verified beyond unit tests:** The app was run against a real database file. Create, update, duplicate (409) and delete (204 → 404) were checked with curl. Then 10,000 employees were seeded and every endpoint was timed; results are in `docs/architecture.md`.
+
+### 7. Frontend
+- **Prompt:** "Do it" (build the React frontend with MUI).
+- **Approach:** Typed API client and formatting helpers first, then the two pages, then tests. The running app was screenshotted with headless Chrome in light mode, dark mode and at narrow width, and checked by eye.
+- **Issues found by looking at the real app, and fixed:**
+  - Port 8080 was already taken by Jenkins on the development machine, so the API moved to 8081 (still overridable with `PORT`).
+  - At narrow widths the wide table pushed the whole page off-screen. Fixed so the table scrolls inside its own box.
+  - The bundle was 1.36 MB in one file. Split by page, so each page loads only the libraries it needs.
+  - The seeded names repeated heavily (ten "Aarav Desai" rows on the first page). The name lists were widened without changing any salary data, confirmed by comparing the insights before and after.
+- **Caught in review:** the form first computed "today" in UTC, which would reject today's date as "in the future" in India before 5:30 am. It now uses the local date.
+

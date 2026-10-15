@@ -66,3 +66,20 @@ Each decision records the context, the choice and the trade-off, so it can be re
 
 - **Choice:** All errors use the standard problem-details JSON format. Validation errors include an `errors` map from field to message. Status codes: 400 invalid input, 404 not found, 409 duplicate.
 - **Why:** A standard format is predictable, and the field map lets the UI show each error next to its input.
+
+## 13. Frontend: MUI with server-side paging
+
+- **Choice:** MUI components, the MUI X Data Grid in server mode, and MUI X Charts.
+- **Why:** The grid asks the API for one page at a time, so the browser never holds all 10,000 employees. Filtering and sorting happen in the database, consistent with the backend design. MUI is widely used and well documented.
+- **Trade-off:** The data grid is large (about 150 kB gzipped). Pages are code-split, so it loads only on the Employees page, and the charts only on Insights.
+
+## 14. Validation in the form as well as the API
+
+- **Choice:** The form checks format rules (required fields, code format, email, positive whole salary, no future date) before sending. Rules that need data, such as duplicate emails, are checked only by the API, and its field errors are shown next to the matching input.
+- **Why:** Instant feedback for simple mistakes, with the API remaining the single source of truth.
+
+## 15. Insights as charts and tables
+
+- **Choice:** Median salary per country and per job title as single-colour horizontal bars, sorted highest first, with values at the bar ends. Every chart has a table view with min, median, average and max.
+- **Why:** Horizontal bars keep long job titles readable. The median is shown rather than the average because a few high salaries pull the average up. The table gives exact figures and works with screen readers.
+- **Checked:** The bar colour passes a contrast check against both the light and dark backgrounds.

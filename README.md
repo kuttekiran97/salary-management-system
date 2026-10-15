@@ -9,7 +9,7 @@ Web-based salary management for ACME's HR team. It replaces the Excel sheets use
 | Path | Contents |
 |---|---|
 | `backend/` | Spring Boot REST API (Java 21, Spring Data JPA, SQLite) |
-| `frontend/` | React single-page app (Vite + TypeScript) |
+| `frontend/` | React single-page app (Vite + TypeScript, MUI, MUI X Data Grid and Charts) |
 | `docs/requirements.md` | One-page requirements: goal, scope, what is left out and why |
 | `docs/architecture.md` | System diagrams, data model, deployment and scalability |
 | `docs/decisions.md` | Architecture and design decisions with trade-offs |
@@ -70,4 +70,5 @@ cd frontend && npm test
 ## Status
 
 - **Backend:** complete. Employee management, salary insights and seed data, covered by 68 tests.
-- **Frontend:** in progress.
+- **Frontend:** complete. Employees page (search, filters, sortable paged table, add/edit/delete) and Insights page (headline figures, charts and tables by country and job title), covered by 33 tests.
+- **Next:** deployment and demo video.
