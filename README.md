@@ -22,7 +22,7 @@ Web-based salary management for ACME's HR team. It replaces the Excel sheets use
 
 ## Running locally
 
-**Backend** (http://localhost:8080). The first run with the seed flag loads 10,000 employees into `backend/salary.db` (about 1–2 seconds). Later runs skip seeding because the data already exists.
+**Backend** (http://localhost:8081; set `PORT` to change it). The first run with the seed flag loads 10,000 employees into `backend/salary.db` (about 1–2 seconds). Later runs skip seeding because the data already exists.
 
 ```bash
 cd backend
