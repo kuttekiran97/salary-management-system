@@ -35,6 +35,15 @@ public final class JobCatalog {
         return TITLES_BY_DEPARTMENT;
     }
 
+    /** The department a job title belongs to, or null if the title is not in the catalog. */
+    public static String departmentOf(String jobTitle) {
+        return TITLES_BY_DEPARTMENT.entrySet().stream()
+                .filter(entry -> entry.getValue().contains(jobTitle))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+    }
+
     public static boolean isValid(String department, String jobTitle) {
         return TITLES_BY_DEPARTMENT.getOrDefault(department, List.of()).contains(jobTitle);
     }

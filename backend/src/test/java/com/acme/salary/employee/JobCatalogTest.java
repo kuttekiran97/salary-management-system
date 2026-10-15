@@ -23,6 +23,12 @@ class JobCatalogTest {
     }
 
     @Test
+    void findsTheDepartmentOfAJobTitle() {
+        assertThat(JobCatalog.departmentOf("Data Scientist")).isEqualTo("Data");
+        assertThat(JobCatalog.departmentOf("Astronaut")).isNull();
+    }
+
+    @Test
     void everyDepartmentHasAtLeastOneTitle() {
         assertThat(JobCatalog.titlesByDepartment()).allSatisfy((department, titles) -> assertThat(titles).isNotEmpty());
     }
