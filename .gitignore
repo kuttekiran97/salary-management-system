@@ -1,0 +1,18 @@
+# Assessment brief (not part of the solution)
+*.docx
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# Local databases
+*.db
+*.db-journal
+
+# Environment files
+.env
+.env.*
+!.env.example
