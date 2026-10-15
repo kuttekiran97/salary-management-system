@@ -11,6 +11,7 @@ Web-based salary management for ACME's HR team. It replaces the Excel sheets use
 | `backend/` | Spring Boot REST API (Java 21, Spring Data JPA, SQLite) |
 | `frontend/` | React single-page app (Vite + TypeScript) |
 | `docs/requirements.md` | One-page requirements: goal, scope, what is left out and why |
+| `docs/architecture.md` | System diagrams, data model, deployment and scalability |
 | `docs/decisions.md` | Architecture and design decisions with trade-offs |
 | `docs/ai-workflow.md` | How AI tools were used, with the prompts |
 
