@@ -44,10 +44,11 @@ Code is grouped by feature, not by technical layer, so each feature can be read 
 
 ```
 com.acme.salary
-├── employee/     Employee entity, repository, service, controller, DTOs
-├── insights/     Salary statistics queries and endpoints
-├── currency/     Fixed exchange rates and conversion
-└── common/       Error handling, shared validation
+├── employee/     Employee entity, search query, service, controller, job catalog
+├── insights/     Salary statistics SQL, service and endpoints
+├── country/      Countries, fixed USD rates, currency conversion, reference data endpoint
+├── seed/         Deterministic generator and loader for 10,000 employees
+└── common/       Error handling, paging, date converters
 ```
 
 ## 3. Request flow: "Average salary by country"
@@ -61,12 +62,12 @@ sequenceDiagram
     participant DB as SQLite
 
     UI->>C: GET /api/insights/by-country
-    C->>S: salaryStatsByCountry()
+    C->>S: byCountry()
     S->>R: aggregate grouped by country
-    R->>DB: SELECT country, COUNT, MIN, MAX, AVG ... GROUP BY country
+    R->>DB: rank salaries per country, then COUNT, MIN, MAX, AVG, median, SUM
     DB-->>R: one row per country
     R-->>S: results
-    S->>S: convert to reporting currency, compute median
+    S->>S: round, add country names, convert to USD
     S-->>C: stats
     C-->>UI: 200 OK (JSON)
 ```
@@ -129,7 +130,15 @@ The current design handles this comfortably:
 - **Pagination:** the API returns one page (e.g. 50 rows) at a time, never all 10,000.
 - **Database-side filtering and aggregation:** the database does the work, and only results cross the network.
 - **Indexes** on the filtered and searched columns keep queries fast as data grows.
-- **Small data:** 10,000 rows is a few MB in SQLite, and aggregate queries over it are expected to take milliseconds.
+- **Small data:** 10,000 employees take 2.7 MB in SQLite.
+
+**Measured** on a laptop, with 10,000 seeded employees and requests made through the HTTP API:
+
+| Operation | Time |
+|---|---|
+| Seed 10,000 employees | 1.3 s |
+| Any insights endpoint (overview, by country, by job title) | 0.07–0.14 s |
+| Employee list page: default, sorted by salary, search + filter, last page | about 0.1 s |
 
 ### Limits of this design
 
