@@ -78,26 +78,35 @@ Aggregation runs in the database, so only a few rows per country are sent back t
 ```mermaid
 erDiagram
     EMPLOYEE {
-        long id PK
-        string employee_code UK
-        string full_name
-        string job_title
-        string country_code FK
-        decimal salary "annual, local currency"
-        date joining_date
+        int id PK
+        text employee_code UK "e.g. EMP-00001"
+        text full_name
+        text email UK
+        text job_title
+        text department
+        text country_code FK
+        int annual_salary "whole units, local currency"
+        text joining_date "ISO date"
+        text created_at
+        text updated_at
     }
     COUNTRY {
-        string code PK "ISO 3166, e.g. IN"
-        string name
-        string currency_code "ISO 4217, e.g. INR"
-        decimal rate_to_usd "fixed rate"
+        text code PK "ISO 3166, e.g. IN"
+        text name
+        text currency_code "ISO 4217, e.g. INR"
+        numeric usd_rate "fixed rate"
     }
     COUNTRY ||--o{ EMPLOYEE : employs
 ```
 
-- Salaries are stored in the **local currency**, the way HR records them, and converted only for cross-country comparisons.
-- Money uses `decimal` (`BigDecimal` in Java), never floating point, to avoid rounding errors.
-- Indexes on `country_code`, `job_title` and `full_name` support the filters and search.
+Defined in `backend/src/main/resources/db/migration/`.
+
+- Salaries are stored in the **local currency**, the way HR records them, and converted to USD only for cross-country comparisons.
+- Salaries are **whole numbers** (`INTEGER`). SQLite has no exact decimal type, and annual salaries are whole amounts, so an integer is exact.
+- The **currency belongs to the country**, so an employee cannot be paid in a currency that doesn't match their country.
+- **Dates are ISO-8601 text** (`2022-04-01`). SQLite has no date type, and ISO text is unambiguous and sorts correctly.
+- The database itself enforces positive salaries, unique codes and emails, and valid countries (foreign keys are switched on in the connection settings).
+- Indexes on `(country_code, job_title)` and `job_title` support filtering and insights.
 - If salary history is required, a `SALARY_REVISION` table (employee, amount, effective date) would be added.
 
 ## 5. Deployment
