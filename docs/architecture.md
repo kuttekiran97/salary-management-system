@@ -8,16 +8,16 @@ The HR Manager uses a React single-page app in the browser. It calls a Spring Bo
 
 ```mermaid
 flowchart LR
-    HR["HR Manager<br/>(browser)"]
+    HR["HR Manager<br/>browser"]
 
-    subgraph FE["Frontend — React SPA"]
-        UI["Pages<br/>Employees · Insights"]
-        API_CLIENT["API client<br/>(typed fetch)"]
+    subgraph FE["Frontend: React SPA"]
+        UI["Pages<br/>Employees and Insights"]
+        API_CLIENT["Typed API client"]
     end
 
-    subgraph BE["Backend — Spring Boot"]
-        CTRL["REST controllers<br/>/api/employees<br/>/api/insights"]
-        SVC["Services<br/>validation · statistics<br/>currency conversion"]
+    subgraph BE["Backend: Spring Boot"]
+        CTRL["REST controllers<br/>employees and insights endpoints"]
+        SVC["Services<br/>validation, statistics,<br/>currency conversion"]
         REPO["Repositories<br/>Spring Data JPA"]
     end
 
@@ -25,7 +25,7 @@ flowchart LR
     SEED["Seed script<br/>10,000 employees"]
 
     HR --> UI --> API_CLIENT
-    API_CLIENT -- "HTTPS / JSON" --> CTRL
+    API_CLIENT -->|"HTTPS + JSON"| CTRL
     CTRL --> SVC --> REPO --> DB
     SEED --> DB
 ```
@@ -104,8 +104,8 @@ erDiagram
 
 ```mermaid
 flowchart LR
-    B["Browser"] -- "static files" --> STATIC["Static host<br/>React build"]
-    B -- "/api (HTTPS)" --> APP["Container<br/>Spring Boot JAR"]
+    B["Browser"] -->|"static files"| STATIC["Static host<br/>React build"]
+    B -->|"API calls over HTTPS"| APP["Container<br/>Spring Boot JAR"]
     APP --> VOL[("Persistent volume<br/>salary.db")]
 ```
 
@@ -150,9 +150,9 @@ flowchart LR
     LB --> A2["API instance 2"]
     LB --> A3["API instance N"]
     A1 & A2 & A3 --> CACHE[("Cache<br/>insights")]
-    A1 & A2 & A3 -- "writes" --> PG[("PostgreSQL<br/>primary")]
-    A1 & A2 & A3 -- "reports" --> RR[("Read replica")]
-    PG -. "replication" .-> RR
+    A1 & A2 & A3 -->|"writes"| PG[("PostgreSQL<br/>primary")]
+    A1 & A2 & A3 -->|"reports"| RR[("Read replica")]
+    PG -.->|"replication"| RR
 ```
 
 At that scale, **authentication and role-based access** would also be needed, because several HR users would see and change sensitive salary data.
