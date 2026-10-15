@@ -5,7 +5,6 @@ Each decision records the context, the choice and the trade-off, so it can be re
 ## 1. Monorepo with separate backend and frontend
 
 - **Choice:** One repository with `backend/` and `frontend/` folders.
-- **Why:** Reviewers see the whole solution and its history in one place. Each part builds and tests on its own.
 - **Trade-off:** Two toolchains (Maven and npm) in one repo, which is manageable at this size.
 
 ## 2. Backend: Java 21 + Spring Boot
