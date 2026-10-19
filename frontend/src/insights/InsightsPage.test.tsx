@@ -38,6 +38,12 @@ describe('InsightsPage', () => {
     expect(screen.getByText('$74,122')).toBeInTheDocument()
   })
 
+  it('says which exchange rates are used and their date', async () => {
+    render(<InsightsPage />)
+
+    expect(await screen.findByText(/European Central Bank reference rates of 19 Oct 2026/)).toBeInTheDocument()
+  })
+
   it('shows countries in a table with local currency and USD, highest median first', async () => {
     render(<InsightsPage />)
     const section = screen.getByRole('region', { name: 'Median salary by country' })

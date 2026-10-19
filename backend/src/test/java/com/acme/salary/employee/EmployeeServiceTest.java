@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 /** Business rules, tested without Spring or a database. */
 class EmployeeServiceTest {
 
-    static final Country INDIA = new Country("IN", "India", "INR", new BigDecimal("0.012"));
+    static final Country INDIA = new Country("IN", "India", "INR", new BigDecimal("0.012"), LocalDate.of(2026, 10, 19));
 
     EmployeeRepository employees = mock(EmployeeRepository.class);
     CountryRepository countries = mock(CountryRepository.class);

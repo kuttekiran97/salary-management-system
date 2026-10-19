@@ -18,7 +18,7 @@ import {
 } from '@mui/material'
 import { api } from '../api/client'
 import type { SalaryStats } from '../api/types'
-import { formatCount, formatMoney } from '../format'
+import { formatCount, formatDate, formatMoney } from '../format'
 import { useApi } from '../useApi'
 import SalaryBarChart from './SalaryBarChart'
 import StatTile from './StatTile'
@@ -37,13 +37,15 @@ export default function InsightsPage() {
   const countries = [...(byCountry.data ?? [])].sort((a, b) => b.salaryUsd.median - a.salaryUsd.median)
   const jobTitles = [...(byJobTitle.data?.jobTitles ?? [])].sort((a, b) => b.salary.median - a.salary.median)
   const jobCurrency = byJobTitle.data?.currencyCode ?? 'USD'
+  const rateAsOf = referenceData.data?.countries[0]?.rateAsOf
 
   return (
     <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: 'minmax(0, 1fr)' }}>
       <Box>
         <Typography variant="h5" component="h2">Insights</Typography>
         <Typography color="text.secondary">
-          How ACME pays people. Cross-country figures are converted to USD at fixed rates.
+          How ACME pays people. Cross-country figures are converted to USD at fixed European Central Bank
+          reference rates{rateAsOf ? ` of ${formatDate(rateAsOf)}` : ''}.
         </Typography>
       </Box>
 

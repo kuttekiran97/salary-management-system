@@ -31,7 +31,7 @@ class InsightsRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // India (INR, rate 0.012): 3 employees -> odd count, median is the middle value
+        // India (INR, rate 0.010534 from V3): 3 employees -> odd count, median is the middle value
         insert("IN", "Software Engineer", 1_000_000);
         insert("IN", "Software Engineer", 2_000_000);
         insert("IN", "Accountant", 6_000_000);
@@ -69,12 +69,12 @@ class InsightsRepositoryTest {
 
     @Test
     void groupsByJobTitleAcrossCountriesInUsd() {
-        // Software Engineers in USD: 12,000 | 24,000 | 100,000 | 120,000
+        // Software Engineers in USD: 10,534 | 21,068 | 100,000 | 120,000
         GroupStats engineers = find(insights.salaryStats(Grouping.JOB_TITLE, Amount.USD, null), "Software Engineer");
 
         assertThat(engineers.headcount()).isEqualTo(4);
-        assertThat(engineers.min()).isEqualTo(12_000, offset(0.01));
-        assertThat(engineers.median()).isEqualTo(62_000, offset(0.01));
+        assertThat(engineers.min()).isEqualTo(10_534, offset(0.01));
+        assertThat(engineers.median()).isEqualTo(60_534, offset(0.01));
     }
 
     @Test

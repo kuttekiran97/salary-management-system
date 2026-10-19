@@ -28,6 +28,16 @@ class SchemaMigrationTest {
     }
 
     @Test
+    void everyCountryHasADatedRate() {
+        Integer undated = jdbc.queryForObject(
+                "SELECT COUNT(*) FROM country WHERE rate_as_of <> '2026-10-19' OR usd_rate <= 0", Integer.class);
+        String indiaRate = jdbc.queryForObject("SELECT usd_rate FROM country WHERE code = 'IN'", String.class);
+
+        assertThat(undated).isZero();
+        assertThat(indiaRate).isEqualTo("0.010534");
+    }
+
+    @Test
     void acceptsAValidEmployee() {
         insertEmployee("EMP-00001", "priya@acme.com", "IN", 1_800_000);
 

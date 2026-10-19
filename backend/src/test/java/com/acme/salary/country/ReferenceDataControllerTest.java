@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,13 @@ class ReferenceDataControllerTest {
     @Test
     void listsCountriesAndDepartmentsWithTheirJobTitles() throws Exception {
         when(countries.findAll(any(Sort.class)))
-                .thenReturn(List.of(new Country("IN", "India", "INR", new BigDecimal("0.012"))));
+                .thenReturn(List.of(new Country("IN", "India", "INR", new BigDecimal("0.012"), LocalDate.of(2026, 10, 19))));
 
         mvc.perform(get("/api/reference-data"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.countries[0].code").value("IN"))
                 .andExpect(jsonPath("$.countries[0].currencyCode").value("INR"))
+                .andExpect(jsonPath("$.countries[0].rateAsOf").value("2026-10-19"))
                 .andExpect(jsonPath("$.departments[0].name").value("Engineering"))
                 .andExpect(jsonPath("$.departments[0].jobTitles[0]").value("Software Engineer"));
     }

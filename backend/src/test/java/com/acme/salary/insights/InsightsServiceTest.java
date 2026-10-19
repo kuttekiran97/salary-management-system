@@ -14,6 +14,7 @@ import com.acme.salary.insights.InsightsRepository.Grouping;
 import com.acme.salary.insights.InsightsService.CountryInsight;
 import com.acme.salary.insights.InsightsService.JobTitleInsights;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /** Rounding, currency conversion and labelling. The SQL itself is covered by InsightsRepositoryTest. */
 class InsightsServiceTest {
 
-    static final Country INDIA = new Country("IN", "India", "INR", new BigDecimal("0.012"));
+    static final Country INDIA = new Country("IN", "India", "INR", new BigDecimal("0.012"), LocalDate.of(2026, 10, 19));
 
     InsightsRepository repository = mock(InsightsRepository.class);
     CountryRepository countries = mock(CountryRepository.class);

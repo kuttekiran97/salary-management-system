@@ -54,6 +54,8 @@ export interface CountryOption {
   name: string
   currencyCode: string
   usdRate: number
+  /** yyyy-MM-dd: the day the rate was published */
+  rateAsOf: string
 }
 
 export interface DepartmentOption {

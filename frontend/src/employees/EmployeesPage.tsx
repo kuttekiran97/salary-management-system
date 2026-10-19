@@ -108,7 +108,7 @@ export default function EmployeesPage() {
     {
       field: 'annualSalaryUsd',
       headerName: 'Salary (USD)',
-      description: 'Converted at a fixed rate so salaries in different currencies can be compared and sorted',
+      description: 'Converted at a fixed, dated ECB reference rate so salaries in different currencies can be compared and sorted',
       width: 130,
       align: 'right',
       headerAlign: 'right',

@@ -2,8 +2,8 @@ import type { Employee, ReferenceData } from './api/types'
 
 export const referenceData: ReferenceData = {
   countries: [
-    { code: 'IN', name: 'India', currencyCode: 'INR', usdRate: 0.012 },
-    { code: 'US', name: 'United States', currencyCode: 'USD', usdRate: 1 },
+    { code: 'IN', name: 'India', currencyCode: 'INR', usdRate: 0.010534, rateAsOf: '2026-10-19' },
+    { code: 'US', name: 'United States', currencyCode: 'USD', usdRate: 1, rateAsOf: '2026-10-19' },
   ],
   departments: [
     { name: 'Engineering', jobTitles: ['Software Engineer', 'QA Engineer'] },
