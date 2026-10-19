@@ -56,3 +56,9 @@ The brief asks for intentional use of AI tools. This file records how AI was use
   - The seeded names repeated heavily (ten "Aarav Desai" rows on the first page). The name lists were widened without changing any salary data, confirmed by comparing the insights before and after.
 - **Caught in review:** the form first computed "today" in UTC, which would reject today's date as "in the future" in India before 5:30 am. It now uses the local date.
 
+### 8. Incubyte's answers: product decisions
+- **Input:** Incubyte replied that the open questions are product decisions for me to make and document.
+- **Decisions (mine):** current salary only; refresh the exchange rates from a published source with an as-of date; add a simple sign-in rather than only describing it. The AI laid out the options and costs; I chose.
+- **Checked:** the rates come from the ECB's published file for 19 October 2026, and the conversion is shown in the migration and in `docs/requirements.md`. Tests that relied on the old India rate were updated to the new expected values rather than loosened.
+- **Sign-in verified in a real browser:** a script drove headless Chrome through a wrong password, sign-in, a full page reload (still signed in), and sign-out (stored credentials cleared). Calls without credentials, with a wrong password, and from an unknown origin were checked with curl.
+

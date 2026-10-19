@@ -1,10 +1,10 @@
 # Architecture
 
-> Diagrams use Mermaid, which GitHub renders automatically. The data model is provisional until the clarifying questions are answered.
+> Diagrams use Mermaid, which GitHub renders automatically.
 
 ## 1. System overview
 
-The HR Manager uses a React single-page app in the browser. It calls a Spring Boot REST API, which stores data in SQLite.
+The HR Manager signs in to a React single-page app in the browser. It calls a Spring Boot REST API, which stores data in SQLite.
 
 ```mermaid
 flowchart LR
@@ -16,6 +16,7 @@ flowchart LR
     end
 
     subgraph BE["Backend: Spring Boot"]
+        SEC["Spring Security<br/>one HR Manager account"]
         CTRL["REST controllers<br/>employees and insights endpoints"]
         SVC["Services<br/>validation, statistics,<br/>currency conversion"]
         REPO["Repositories<br/>Spring Data JPA"]
@@ -25,14 +26,15 @@ flowchart LR
     SEED["Seed script<br/>10,000 employees"]
 
     HR --> UI --> API_CLIENT
-    API_CLIENT -->|"HTTPS + JSON"| CTRL
-    CTRL --> SVC --> REPO --> DB
+    API_CLIENT -->|"HTTPS + JSON, Basic auth"| SEC
+    SEC --> CTRL --> SVC --> REPO --> DB
     SEED --> DB
 ```
 
 | Part | Responsibility |
 |---|---|
 | **React SPA** | Screens, forms, client-side validation feedback. No business rules. |
+| **Spring Security** | Rejects any `/api` call without the HR Manager's credentials (401). Stateless: no session or cookie. |
 | **Controllers** | HTTP only: parse requests, return status codes and JSON. |
 | **Services** | Business rules: validation, salary statistics, currency conversion. Unit-tested without a database. |
 | **Repositories** | Database access. Filtering, sorting, paging and aggregation run in SQL. |
@@ -44,6 +46,7 @@ Code is grouped by feature, not by technical layer, so each feature can be read 
 
 ```
 com.acme.salary
+├── auth/         Security configuration, current-user endpoint
 ├── employee/     Employee entity, search query, service, controller, job catalog
 ├── insights/     Salary statistics SQL, service and endpoints
 ├── country/      Countries, fixed USD rates, currency conversion, reference data endpoint
@@ -74,7 +77,7 @@ sequenceDiagram
 
 Aggregation runs in the database, so only a few rows per country are sent back to the application, not all 10,000 employees.
 
-## 4. Data model (provisional)
+## 4. Data model
 
 ```mermaid
 erDiagram
@@ -95,7 +98,8 @@ erDiagram
         text code PK "ISO 3166, e.g. IN"
         text name
         text currency_code "ISO 4217, e.g. INR"
-        numeric usd_rate "fixed rate"
+        numeric usd_rate "fixed ECB rate"
+        text rate_as_of "rate date, 2026-10-19"
     }
     COUNTRY ||--o{ EMPLOYEE : employs
 ```
@@ -108,7 +112,8 @@ Defined in `backend/src/main/resources/db/migration/`.
 - **Dates are ISO-8601 text** (`2022-04-01`). SQLite has no date type, and ISO text is unambiguous and sorts correctly.
 - The database itself enforces positive salaries, unique codes and emails, and valid countries (foreign keys are switched on in the connection settings).
 - Indexes on `(country_code, job_title)` and `job_title` support filtering and insights.
-- If salary history is required, a `SALARY_REVISION` table (employee, amount, effective date) would be added.
+- Exchange rates are the ECB reference rates of 19 October 2026, stored with their date (migration `V3`); see `docs/requirements.md`.
+- Only the current salary is kept. If salary history is required, a `SALARY_REVISION` table (employee, amount, effective date) would be added.
 
 ## 5. Deployment
 
@@ -120,6 +125,14 @@ flowchart LR
 ```
 
 The frontend is a static build that can be served from any static host or CDN. The backend runs as a single container, with the SQLite file on a persistent volume.
+
+| Setting | Where | Purpose |
+|---|---|---|
+| `PORT` | backend | Port to listen on (default 8081) |
+| `DB_URL` | backend | SQLite file location |
+| `APP_USERNAME`, `APP_PASSWORD` | backend | The HR Manager account; without a password a random one is logged at startup |
+| `CORS_ALLOWED_ORIGINS` | backend | The frontend's address, when it is on another domain |
+| `VITE_API_URL` | frontend build | The API's address, when it is on another domain |
 
 ## 6. Scalability
 
@@ -146,7 +159,7 @@ The current design handles this comfortably:
 |---|---|
 | One writer at a time | SQLite locks the whole database for each write. Fine for one HR user, not for many concurrent editors. |
 | One backend instance | The SQLite file lives on a single machine, so the backend can't be run as several instances. |
-| Statistics computed on every request | Fine at 10,000 rows; slower at millions. |
+| Statistics computed on every request | Fine at 10,000 rows; slower at millions.|
 
 ### How it would scale
 
@@ -173,4 +186,4 @@ flowchart LR
     PG -.->|"replication"| RR
 ```
 
-At that scale, **authentication and role-based access** would also be needed, because several HR users would see and change sensitive salary data.
+At that scale, the single account would be replaced by the company's identity provider (OpenID Connect) with **role-based access** and an audit log, because several HR users would see and change sensitive salary data. The API is already stateless, so token-based sign-in fits without changing the scaling model.

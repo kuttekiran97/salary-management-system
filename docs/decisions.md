@@ -37,9 +37,9 @@ Each decision records the context, the choice and the trade-off, so it can be re
 
 ## 7. Salaries: whole numbers in local currency, compared in USD
 
-- **Choice:** `annual_salary` is an integer in the employee's local currency. Each country has a fixed USD rate. API responses include the USD equivalent.
-- **Why:** HR records pay in local currency, so stored values match their source data. Integers are exact; SQLite has no exact decimal type. Fixed rates make insights reproducible and tests deterministic.
-- **Trade-off:** USD figures are approximate and do not follow market rates. Live rates are out of scope.
+- **Choice:** `annual_salary` is an integer in the employee's local currency. Each country has a fixed USD rate taken from the European Central Bank reference rates of 19 October 2026, stored with that date (`rate_as_of`). API responses include the USD equivalent, and the Insights page names the source and date.
+- **Why:** HR records pay in local currency, so stored values match their source data. Integers are exact; SQLite has no exact decimal type. Fixed rates make insights reproducible and tests deterministic. A published source and date make the USD figures checkable.
+- **Trade-off:** USD figures drift from market rates over time. Refreshing means a new migration with new rates and date. Live rates are out of scope, since they would make the same report change from day to day.
 
 ## 8. Sorting by salary uses the USD equivalent
 
@@ -83,3 +83,15 @@ Each decision records the context, the choice and the trade-off, so it can be re
 - **Choice:** Median salary per country and per job title as single-colour horizontal bars, sorted highest first, with values at the bar ends. Every chart has a table view with min, median, average and max.
 - **Why:** Horizontal bars keep long job titles readable. The median is shown rather than the average because a few high salaries pull the average up. The table gives exact figures and works with screen readers.
 - **Checked:** The bar colour passes a contrast check against both the light and dark backgrounds.
+
+## 16. Current salary only, no history
+
+- **Choice:** each employee has one current salary; an edit replaces it.
+- **Why:** every insight chosen (requirements, section 2) is about pay now. One row per employee keeps lists and statistics simple and fast.
+- **Trade-off:** no raise history and no audit trail. Adding a `salary_revision` table later does not change the existing screens.
+
+## 17. Sign-in: one account, stateless HTTP Basic
+
+- **Choice:** Spring Security protects `/api/**`. Every request carries HTTP Basic credentials, and the server keeps no session. The account comes from `APP_USERNAME` / `APP_PASSWORD`; with no password set, a random one is generated and logged. The UI keeps the credentials in `sessionStorage` and returns to its sign-in page on any 401.
+- **Why:** with no cookies there is nothing for CSRF to exploit, the API stays stateless (any instance can serve any request), and the frontend can be hosted on another domain with only a CORS setting. 401 responses omit `WWW-Authenticate`, so browsers show the app's page rather than their own pop-up. Generating a password prevents a deployment from running with a known default.
+- **Trade-off:** the password is sent with every request (safe only over HTTPS) and sits in `sessionStorage` until the tab closes, so a cross-site scripting bug could read it. For more users, the next step is the company's identity provider (OpenID Connect) with short-lived tokens, roles, and an audit log.
