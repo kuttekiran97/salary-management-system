@@ -18,14 +18,19 @@ import com.acme.salary.common.NotFoundException;
 import com.acme.salary.common.PageResponse;
 import java.time.LocalDate;
 import java.util.List;
+import com.acme.salary.auth.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 /** HTTP contract: routes, status codes, validation and error format. The service is mocked. */
+@Import(SecurityConfig.class)
+@WithMockUser(roles = "HR_MANAGER")
 @WebMvcTest(EmployeeController.class)
 class EmployeeControllerTest {
 
