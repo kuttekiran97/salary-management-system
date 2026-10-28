@@ -12,14 +12,11 @@ RUN ./mvnw package -DskipTests -B
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Create directory for SQLite database
-RUN mkdir -p /data
-
 COPY --from=build /app/target/*.jar app.jar
 
-# Render sets PORT; SQLite file lives on the persistent disk at /data
+# Render sets PORT; SQLite file in /app (ephemeral on free tier, persistent with disk at /data)
 ENV PORT=8080
-ENV DB_URL=jdbc:sqlite:/data/salary.db?foreign_keys=true
+ENV DB_URL=jdbc:sqlite:salary.db?foreign_keys=true
 
 EXPOSE 8080
 

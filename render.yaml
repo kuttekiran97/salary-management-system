@@ -1,8 +1,12 @@
 # Render Blueprint: https://docs.render.com/infrastructure-as-code
 # Deploy both services from this file, or create them manually in the dashboard.
+#
+# FREE TIER NOTE: Data is ephemeral (lost on restart/redeploy). The seed script
+# recreates 10,000 employees on each start, so this works for demos. For persistent
+# data, upgrade to Starter ($7/mo) and uncomment the disk section below.
 
 services:
-  # Backend: Spring Boot API with SQLite on a persistent disk
+  # Backend: Spring Boot API with SQLite
   - type: web
     name: salary-api
     runtime: docker
@@ -16,10 +20,11 @@ services:
         generateValue: true
       - key: CORS_ALLOWED_ORIGINS
         sync: false  # Set after frontend deploys: https://<frontend-name>.onrender.com
-    disk:
-      name: salary-data
-      mountPath: /data
-      sizeGB: 1
+    # Uncomment for persistent data (requires Starter plan, $7/mo):
+    # disk:
+    #   name: salary-data
+    #   mountPath: /data
+    #   sizeGB: 1
 
   # Frontend: React static site
   - type: web
@@ -27,7 +32,6 @@ services:
     runtime: static
     buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: frontend/dist
-    region: oregon
     headers:
       - path: /*
         name: Cache-Control
