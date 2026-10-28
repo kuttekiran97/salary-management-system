@@ -1,4 +1,4 @@
-import { ApiError, api, basicAuthorization, currentUser, onSignedOut, signIn, signOut, toQueryString } from './client'
+import { ApiError, api, toQueryString } from './client'
 
 describe('toQueryString', () => {
   it('leaves out empty values', () => {
@@ -44,54 +44,5 @@ describe('api', () => {
     expect(url).toBe('/api/employees')
     expect(init.method).toBe('POST')
     expect(init.headers).toEqual({ 'Content-Type': 'application/json' })
-  })
-})
-
-describe('signing in', () => {
-  const ok = (body: object) => new Response(JSON.stringify(body), { status: 200 })
-
-  afterEach(() => {
-    signOut()
-    vi.unstubAllGlobals()
-  })
-
-  it('encodes credentials as UTF-8 HTTP Basic', () => {
-    expect(basicAuthorization('hr', 'secret')).toBe('Basic aHI6c2VjcmV0')
-    expect(basicAuthorization('hr', 'pässword')).toBe('Basic aHI6cMOkc3N3b3Jk')
-  })
-
-  it('checks the credentials, then sends them with every request', async () => {
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(ok({ username: 'hr' }))
-      .mockResolvedValueOnce(ok({ headcount: 1 }))
-    vi.stubGlobal('fetch', fetchMock)
-
-    expect(await signIn('hr', 'secret')).toBe('hr')
-    await api.overview()
-
-    expect(currentUser()).toBe('hr')
-    expect(fetchMock.mock.calls[0][0]).toBe('/api/auth/me')
-    expect(fetchMock.mock.calls[1][1].headers).toEqual({ Authorization: 'Basic aHI6c2VjcmV0' })
-  })
-
-  it('keeps nobody signed in when the password is wrong', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 401 })))
-
-    await expect(signIn('hr', 'wrong')).rejects.toMatchObject({ status: 401 })
-    expect(currentUser()).toBeUndefined()
-  })
-
-  it('signs out and notifies the app when the API rejects the stored credentials', async () => {
-    const signedOut = vi.fn()
-    onSignedOut(signedOut)
-    vi.stubGlobal('fetch', vi.fn()
-      .mockResolvedValueOnce(ok({ username: 'hr' }))
-      .mockResolvedValueOnce(new Response('{}', { status: 401 })))
-
-    await signIn('hr', 'secret')
-    await expect(api.overview()).rejects.toMatchObject({ status: 401 })
-
-    expect(currentUser()).toBeUndefined()
-    expect(signedOut).toHaveBeenCalledOnce()
   })
 })

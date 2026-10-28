@@ -45,11 +45,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(requests -> requests
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/**").hasRole(ROLE)
-                        .anyRequest().permitAll())
-                .httpBasic(basic -> basic.authenticationEntryPoint(unauthorized()))
+                .authorizeHttpRequests(requests -> requests.anyRequest().permitAll())
                 .build();
     }
 

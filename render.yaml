@@ -16,8 +16,6 @@ services:
     plan: free
     healthCheckPath: /api/auth/me
     envVars:
-      - key: APP_PASSWORD
-        generateValue: true
       - key: CORS_ALLOWED_ORIGINS
         sync: false  # Set after frontend deploys: https://<frontend-name>.onrender.com
     # Uncomment for persistent data (requires Starter plan, $7/mo):

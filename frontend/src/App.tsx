@@ -1,8 +1,6 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
-import { AppBar, Box, Button, Container, LinearProgress, Tab, Tabs, Toolbar, Typography } from '@mui/material'
+import { lazy, Suspense } from 'react'
+import { AppBar, Box, Container, LinearProgress, Tab, Tabs, Toolbar, Typography } from '@mui/material'
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import { currentUser, onSignedOut, signOut } from './api/client'
-import LoginPage from './LoginPage'
 
 // Each page loads its own code, so the data grid and chart libraries download only when needed
 const EmployeesPage = lazy(() => import('./employees/EmployeesPage'))
@@ -16,19 +14,6 @@ const PAGES = [
 function App() {
   const { pathname } = useLocation()
   const currentTab = PAGES.find((page) => pathname.startsWith(page.path))?.path ?? false
-  const [user, setUser] = useState(currentUser)
-
-  // If the API rejects the stored credentials (e.g. the password changed), go back to sign-in
-  useEffect(() => onSignedOut(() => setUser(undefined)), [])
-
-  if (!user) {
-    return <LoginPage onSignedIn={setUser} />
-  }
-
-  function handleSignOut() {
-    signOut()
-    setUser(undefined)
-  }
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -42,10 +27,6 @@ function App() {
               <Tab key={page.path} label={page.label} value={page.path} component={Link} to={page.path} />
             ))}
           </Tabs>
-          <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2" color="text.secondary">Signed in as {user}</Typography>
-            <Button size="small" onClick={handleSignOut}>Sign out</Button>
-          </Box>
         </Toolbar>
       </AppBar>
       <Container maxWidth="xl" sx={{ py: 3 }}>

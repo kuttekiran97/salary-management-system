@@ -2,15 +2,13 @@
 
 Web-based salary management for ACME's HR team. It replaces the Excel sheets used to manage pay for 10,000 employees across several countries, and answers questions about how the organisation pays people.
 
-**User:** HR Manager, who signs in with a single account.
-
 ## Repository layout
 
 | Path | Contents |
 |---|---|
-| `backend/` | Spring Boot REST API (Java 21, Spring Data JPA, Spring Security, SQLite) |
+| `backend/` | Spring Boot REST API (Java 21, Spring Data JPA, SQLite) |
 | `frontend/` | React single-page app (Vite + TypeScript, MUI, MUI X Data Grid and Charts) |
-| `docs/requirements.md` | One-page requirements: chosen insights, fields, history, exchange rates, sign-in, and why |
+| `docs/requirements.md` | One-page requirements: chosen insights, fields, history, exchange rates, and why |
 | `docs/architecture.md` | System diagrams, data model, deployment and scalability |
 | `docs/decisions.md` | Architecture and design decisions with trade-offs |
 | `docs/ai-workflow.md` | How AI tools were used, with the prompts |
@@ -26,10 +24,8 @@ Web-based salary management for ACME's HR team. It replaces the Excel sheets use
 
 ```bash
 cd backend
-APP_PASSWORD=choose-a-password ./mvnw spring-boot:run -Dspring-boot.run.arguments=--app.seed.enabled=true
+./mvnw spring-boot:run -Dspring-boot.run.arguments=--app.seed.enabled=true
 ```
-
-Sign in as `hr` with that password. Without `APP_PASSWORD`, a random password is generated and printed in the startup log (`Generated password for 'hr': ...`). Set `APP_USERNAME` to change the username.
 
 **Frontend** (http://localhost:5173, forwards `/api` calls to the backend):
 
@@ -43,7 +39,6 @@ npm run dev
 
 | Method and path | Purpose |
 |---|---|
-| `GET /api/auth/me` | The signed-in user; used by the sign-in page to check credentials |
 | `GET /api/employees` | List employees. Query parameters: `search` (name, email or code), `country`, `department`, `jobTitle`, `sort` (`NAME`, `EMPLOYEE_CODE`, `JOINING_DATE`, `SALARY`), `descending`, `page`, `size` (max 100) |
 | `GET /api/employees/{id}` | One employee |
 | `POST /api/employees` | Add an employee |
@@ -53,8 +48,6 @@ npm run dev
 | `GET /api/insights/overview` | Organisation-wide headcount and pay (USD) |
 | `GET /api/insights/by-country` | Headcount and min / max / average / median / total pay per country, in local currency and USD |
 | `GET /api/insights/by-job-title` | The same statistics per job title: in USD across all countries, or in local currency with `?country=IN` |
-
-Every endpoint requires the HR Manager's credentials (HTTP Basic); without them the API answers 401.
 
 Salaries are stored in each country's local currency and converted to USD at European Central Bank reference rates of 19 October 2026 (rates and method in `docs/requirements.md`). Every employee response includes `annualSalaryUsd`, and sorting by `SALARY` uses the USD equivalent so different currencies compare correctly.
 
@@ -82,22 +75,20 @@ The app deploys to [Render](https://render.com) with the included `render.yaml` 
 2. Go to [Render Dashboard](https://dashboard.render.com) → **New** → **Blueprint**
 3. Connect your GitHub repo and select it
 4. Render reads `render.yaml` and creates both services:
-   - **salary-api** — backend with persistent disk for SQLite
+   - **salary-api** — backend API
    - **salary-ui** — frontend static site
 5. After both deploy, set the environment variables:
    - On **salary-api**: set `CORS_ALLOWED_ORIGINS` to `https://salary-ui.onrender.com`
    - On **salary-ui**: set `VITE_API_URL` to `https://salary-api.onrender.com` and redeploy
-6. Find the generated `APP_PASSWORD` in salary-api's environment tab; sign in as `hr` with that password
 
 ### Notes
 
-- **Free tier:** services spin down after 15 minutes of inactivity and take ~30 seconds to wake on the next request. Upgrade to a paid plan for always-on.
-- **Persistent data:** the SQLite database lives on a 1 GB disk at `/data`. Seeding runs automatically on first start.
+- **Free tier:** services spin down after 15 minutes of inactivity and take ~30 seconds to wake on the next request. Data is ephemeral but seed recreates 10,000 employees on each start.
 - **Custom domain:** add it in Render's dashboard and update `CORS_ALLOWED_ORIGINS`.
 
 ## Status
 
-- **Backend:** complete. Sign-in, employee management, salary insights and seed data, covered by 75 tests.
-- **Frontend:** complete. Sign-in page, Employees page (search, filters, sortable paged table, add/edit/delete) and Insights page (headline figures, charts and tables by country and job title), covered by 40 tests.
+- **Backend:** complete. Employee management, salary insights and seed data, covered by 69 tests.
+- **Frontend:** complete. Employees page (search, filters, sortable paged table, add/edit/delete) and Insights page (headline figures, charts and tables by country and job title).
 - **Requirements:** final. Incubyte left the product decisions to me; they are documented with reasons in `docs/requirements.md`.
 - **Deployed:** Render (see Deployment section above).
