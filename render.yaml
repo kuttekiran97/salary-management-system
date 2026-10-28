@@ -14,7 +14,7 @@ services:
     dockerContext: backend
     region: oregon
     plan: free
-    healthCheckPath: /api/auth/me
+    healthCheckPath: /api/reference-data
     envVars:
       - key: CORS_ALLOWED_ORIGINS
         sync: false  # Set after frontend deploys: https://<frontend-name>.onrender.com
