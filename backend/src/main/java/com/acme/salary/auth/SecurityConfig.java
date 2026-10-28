@@ -87,13 +87,18 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /** Allows the deployed frontend's origin(s); empty in development, where Vite proxies the API. */
+    /** Allows the deployed frontend's origin(s); allows all origins when not configured. */
     @Bean
     CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origins:}") String origins) {
         CorsConfiguration cors = new CorsConfiguration();
-        cors.setAllowedOrigins(Arrays.stream(origins.split(",")).map(String::trim).filter(o -> !o.isEmpty()).toList());
+        List<String> allowedOrigins = Arrays.stream(origins.split(",")).map(String::trim).filter(o -> !o.isEmpty()).toList();
+        if (allowedOrigins.isEmpty()) {
+            cors.setAllowedOriginPatterns(List.of("*"));
+        } else {
+            cors.setAllowedOrigins(allowedOrigins);
+        }
         cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        cors.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        cors.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", cors);
         return source;
