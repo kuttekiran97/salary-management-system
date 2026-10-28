@@ -72,9 +72,32 @@ cd backend && ./mvnw test
 cd frontend && npm test
 ```
 
+## Deployment
+
+The app deploys to [Render](https://render.com) with the included `render.yaml` blueprint.
+
+### Quick start (Render Dashboard)
+
+1. Push this repo to GitHub
+2. Go to [Render Dashboard](https://dashboard.render.com) → **New** → **Blueprint**
+3. Connect your GitHub repo and select it
+4. Render reads `render.yaml` and creates both services:
+   - **salary-api** — backend with persistent disk for SQLite
+   - **salary-ui** — frontend static site
+5. After both deploy, set the environment variables:
+   - On **salary-api**: set `CORS_ALLOWED_ORIGINS` to `https://salary-ui.onrender.com`
+   - On **salary-ui**: set `VITE_API_URL` to `https://salary-api.onrender.com` and redeploy
+6. Find the generated `APP_PASSWORD` in salary-api's environment tab; sign in as `hr` with that password
+
+### Notes
+
+- **Free tier:** services spin down after 15 minutes of inactivity and take ~30 seconds to wake on the next request. Upgrade to a paid plan for always-on.
+- **Persistent data:** the SQLite database lives on a 1 GB disk at `/data`. Seeding runs automatically on first start.
+- **Custom domain:** add it in Render's dashboard and update `CORS_ALLOWED_ORIGINS`.
+
 ## Status
 
 - **Backend:** complete. Sign-in, employee management, salary insights and seed data, covered by 75 tests.
 - **Frontend:** complete. Sign-in page, Employees page (search, filters, sortable paged table, add/edit/delete) and Insights page (headline figures, charts and tables by country and job title), covered by 40 tests.
 - **Requirements:** final. Incubyte left the product decisions to me; they are documented with reasons in `docs/requirements.md`.
-- **Next:** deployment and demo video.
+- **Deployed:** Render (see Deployment section above).

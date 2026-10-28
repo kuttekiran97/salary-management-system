@@ -1,0 +1,18 @@
+# Build outputs
+target/
+
+# IDE and editor files
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# Local database
+*.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md

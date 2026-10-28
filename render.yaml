@@ -1,0 +1,41 @@
+# Render Blueprint: https://docs.render.com/infrastructure-as-code
+# Deploy both services from this file, or create them manually in the dashboard.
+
+services:
+  # Backend: Spring Boot API with SQLite on a persistent disk
+  - type: web
+    name: salary-api
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    region: oregon
+    plan: free
+    healthCheckPath: /api/auth/me
+    envVars:
+      - key: APP_PASSWORD
+        generateValue: true
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false  # Set after frontend deploys: https://<frontend-name>.onrender.com
+    disk:
+      name: salary-data
+      mountPath: /data
+      sizeGB: 1
+
+  # Frontend: React static site
+  - type: web
+    name: salary-ui
+    runtime: static
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: frontend/dist
+    region: oregon
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        sync: false  # Set to backend URL: https://salary-api.onrender.com
