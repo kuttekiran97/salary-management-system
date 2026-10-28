@@ -11,7 +11,6 @@ Web-based salary management for ACME's HR team. It replaces the Excel sheets use
 | `docs/requirements.md` | One-page requirements: chosen insights, fields, history, exchange rates, and why |
 | `docs/architecture.md` | System diagrams, data model, deployment and scalability |
 | `docs/decisions.md` | Architecture and design decisions with trade-offs |
-| `docs/ai-workflow.md` | How AI tools were used, with the prompts |
 
 ## Prerequisites
 
