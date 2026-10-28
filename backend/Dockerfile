@@ -3,6 +3,7 @@ FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 COPY .mvn .mvn
 COPY mvnw pom.xml ./
+RUN chmod +x mvnw
 # Download dependencies first (cached unless pom.xml changes)
 RUN ./mvnw dependency:go-offline -B
 COPY src src
